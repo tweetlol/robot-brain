@@ -139,6 +139,7 @@
 
     <script>
         async function runScript(scriptName) {
+            console.log(`Attempting to run script: ${scriptName}`);
             const statusDiv = document.getElementById('status');
             const buttons = document.querySelectorAll('button');
             
@@ -151,6 +152,7 @@
             statusDiv.innerHTML = `Running ${scriptName}...<span class="loading"></span>`;
             
             try {
+                console.log(`Fetching: /api/run/${scriptName}`);
                 const response = await fetch(`/api/run/${scriptName}`, {
                     method: 'POST',
                     headers: {
@@ -158,16 +160,19 @@
                     }
                 });
                 
+                console.log(`Response status: ${response.status}`);
                 const data = await response.json();
+                console.log('Response data:', data);
                 
                 if (response.ok) {
                     statusDiv.className = 'status success';
-                    statusDiv.innerHTML = `✓ ${data.message || 'Script executed successfully!'}`;
+                    statusDiv.innerHTML = `✓ ${data.message || 'Script executed successfully!'}<br><small>PID: ${data.pid || 'N/A'}</small>`;
                 } else {
                     statusDiv.className = 'status error';
                     statusDiv.innerHTML = `✗ Error: ${data.detail || 'Failed to execute script'}`;
                 }
             } catch (error) {
+                console.error('Fetch error:', error);
                 statusDiv.className = 'status error';
                 statusDiv.innerHTML = `✗ Error: ${error.message}`;
             } finally {

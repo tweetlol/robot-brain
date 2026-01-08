@@ -2,11 +2,26 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi import Request
 import os
 import subprocess
+import logging
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Mount static files
 static_dir = os.path.join(os.path.dirname(__file__), '..', 'static')
@@ -31,6 +46,8 @@ async def run_script(script_name: str):
     Run a Python script on the Raspberry Pi.
     Update the script paths below to point to your actual scripts.
     """
+    logger.info(f"Received request to run script: {script_name}")
+    
     # Map script names to their file paths
     script_paths = {
         "script1": "/home/fj/robot-brain/GPIOpin-basics/blinkGPIOpin.py",
@@ -38,28 +55,37 @@ async def run_script(script_name: str):
     }
     
     if script_name not in script_paths:
+        logger.error(f"Script '{script_name}' not found in mapping")
         raise HTTPException(status_code=404, detail=f"Script '{script_name}' not found")
     
     script_path = script_paths[script_name]
+    logger.info(f"Script path: {script_path}")
     
     if not os.path.exists(script_path):
+        logger.error(f"Script file does not exist: {script_path}")
         raise HTTPException(status_code=404, detail=f"Script file not found: {script_path}")
     
     try:
         # Run the script in the background
         # Use subprocess.Popen for non-blocking execution
+        logger.info(f"Starting script: {script_path}")
         process = subprocess.Popen(
             ["python3", script_path],
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE
+            stderr=subprocess.PIPE,
+            cwd=os.path.dirname(script_path)
         )
+        
+        logger.info(f"Script started with PID: {process.pid}")
         
         return {
             "status": "success",
             "message": f"Script '{script_name}' started successfully",
-            "script_path": script_path
+            "script_path": script_path,
+            "pid": process.pid
         }
     except Exception as e:
+        logger.error(f"Failed to run script: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to run script: {str(e)}")
 
 if __name__ == "__main__":
