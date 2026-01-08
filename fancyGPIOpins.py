@@ -1,5 +1,4 @@
 
-
 import gpiozero
 import time
 
@@ -19,11 +18,16 @@ for i in range(6):
 pin1.off()
 
 
-for i in range(6):
+for i in range(16):
 	pin1.on()
 	pin2.on()
-	time.sleep(1/i)
+	time.sleep(1/(i+1))
+	pin1.off()
+	pin2.off()
+	time.sleep(1/(1+i))
 
+
+"""
 for i in range(6):
 	pin1.on()
 	time.sleep(.5)
@@ -32,7 +36,7 @@ for i in range(6):
 	time.sleep(.5)
 	pin2.off()
 pin1.off()
-
+"""
 
 
 pin1.close()
