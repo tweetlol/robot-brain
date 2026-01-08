@@ -66,24 +66,37 @@ async def run_script(script_name: str):
         raise HTTPException(status_code=404, detail=f"Script file not found: {script_path}")
     
     try:
-        # Run the script in the background
-        # Use subprocess.Popen for non-blocking execution
+        # Run the script and wait for it to complete to capture any errors
         logger.info(f"Starting script: {script_path}")
-        process = subprocess.Popen(
+        result = subprocess.run(
             ["python3", script_path],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=os.path.dirname(script_path)
+            capture_output=True,
+            text=True,
+            cwd=os.path.dirname(script_path),
+            timeout=30  # 30 second timeout
         )
         
-        logger.info(f"Script started with PID: {process.pid}")
+        logger.info(f"Script completed with return code: {result.returncode}")
+        logger.info(f"STDOUT: {result.stdout}")
+        if result.stderr:
+            logger.error(f"STDERR: {result.stderr}")
+        
+        if result.returncode != 0:
+            raise HTTPException(
+                status_code=500, 
+                detail=f"Script failed with error: {result.stderr}"
+            )
         
         return {
             "status": "success",
-            "message": f"Script '{script_name}' started successfully",
+            "message": f"Script '{script_name}' executed successfully",
             "script_path": script_path,
-            "pid": process.pid
+            "output": result.stdout,
+            "error": result.stderr if result.stderr else None
         }
+    except subprocess.TimeoutExpired:
+        logger.error("Script execution timed out")
+        raise HTTPException(status_code=500, detail="Script execution timed out after 30 seconds")
     except Exception as e:
         logger.error(f"Failed to run script: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to run script: {str(e)}")
