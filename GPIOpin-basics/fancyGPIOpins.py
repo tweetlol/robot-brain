@@ -2,6 +2,8 @@
 import gpiozero
 import time
 
+print("running fancyGPIOpins.py")
+
 PIN_BCM_NUMBER_1 = 21
 PIN_BCM_NUMBER_2 = 1
 
