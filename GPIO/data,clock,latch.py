@@ -52,6 +52,10 @@ def fill(bit):
 fill(0)
 ping(latch)
 
+for i in range(100):
+    write(i%2)
+    ping(latch)
+
 data.close()
 clock.close()
 latch.close()
