@@ -50,8 +50,8 @@ async def run_script(script_name: str):
     
     # Map script names to their file paths
     script_paths = {
-        "script1": "/home/fj/robot-brain/GPIOpin-basics/blinkGPIOpin.py",
-        "script2": "/home/fj/robot-brain/GPIOpin-basics/fancyGPIOpins.py",
+        "script1": "/home/fj/robot-brain/GPIO/blinkGPIOpin.py",
+        "script2": "/home/fj/robot-brain/GPIO/fancyGPIOpins.py",
     }
     
     if script_name not in script_paths:
