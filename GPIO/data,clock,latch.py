@@ -4,7 +4,7 @@
 import gpiozero
 import time
 
-print("running fancyGPIOpins.py")
+print("data,clock,latch.py")
 
 PIN_BCM_NUMBER_1 = 21
 PIN_BCM_NUMBER_2 = 1
@@ -36,7 +36,20 @@ def write(bit):
     else:
         print("ERROR: non-binary written value")
 
+def fill(bit):
+    if bit == 1:
+        data.on()
+        for i in range(7):
+            ping(clock)
+        data.off()
+    elif bit == 0:
+        data.off()
+        for i in range(7):
+            ping(clock)
+    else:
+        print("ERROR: non-binary written value")
 
+fill(0)
 ping(latch)
 
 data.close()
