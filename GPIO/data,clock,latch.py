@@ -39,12 +39,12 @@ def write(bit):
 def fill(bit):
     if bit == 1:
         data.on()
-        for i in range(7):
+        for i in range(8):
             ping(clock)
         data.off()
     elif bit == 0:
         data.off()
-        for i in range(7):
+        for i in range(8):
             ping(clock)
     else:
         print("ERROR: non-binary written value")
