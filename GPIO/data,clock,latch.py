@@ -18,7 +18,7 @@ data.off()
 clock.off()
 latch.off()
 
-SLEEPS = 0.05
+SLEEPS = 0.01
 
 def ping(pin):
     time.sleep(SLEEPS)
